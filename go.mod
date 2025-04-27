@@ -1,4 +1,4 @@
-module github.com/devnev/pgx-rowtozeronulls
+module github.com/devnev/pgx-x-zeronulls
 
 go 1.24.1
 

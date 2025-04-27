@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-func TestWrapRowTo(t *testing.T) {
+func TestWrapRows(t *testing.T) {
 	const testValue int32 = 123
 
 	p := pgtype.Int4Codec{}.PlanEncode(nil, 0, pgtype.BinaryFormatCode, testValue)
@@ -21,7 +21,7 @@ func TestWrapRowTo(t *testing.T) {
 		data: [][][]byte{{b}},
 	}
 
-	ts, err := pgx.CollectOneRow(rows, zeronulls.WrapRowTo(pgx.RowToStructByName[testStruct]))
+	ts, err := pgx.CollectOneRow(zeronulls.WrapRows(rows), pgx.RowToStructByName[testStruct])
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -29,8 +29,4 @@ func TestWrapRowTo(t *testing.T) {
 	if ts.Num != testValue {
 		t.Fatalf("unexpected read value, expected %d, got %d", testValue, ts.Num)
 	}
-}
-
-type testStruct struct {
-	Num int32
 }
