@@ -110,8 +110,9 @@ func (s rowScanner) ScanRow(rows pgx.Rows) error {
 		}
 
 		// This is where the NULL handling happens
-		if values[i] == nil {
-			reflect.ValueOf(dst).Elem().Set(reflect.Zero((*s.scanTypes)[i]))
+		if values[i] == nil && (*s.scanTypes)[i].Kind() == reflect.Ptr {
+			reflect.ValueOf(dst).Elem().Set(reflect.Zero((*s.scanTypes)[i].Elem()))
+			continue
 		}
 
 		err := (*s.scanPlans)[i].Scan(values[i], dst)

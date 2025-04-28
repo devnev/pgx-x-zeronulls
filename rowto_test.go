@@ -18,16 +18,25 @@ func TestWrapRowTo(t *testing.T) {
 		fds: []pgconn.FieldDescription{
 			{Name: "num", DataTypeOID: pgtype.Int4OID, Format: pgtype.BinaryFormatCode},
 		},
-		data: [][][]byte{{b}},
+		data: [][][]byte{
+			{b},
+			{nil},
+		},
 	}
 
-	ts, err := pgx.CollectOneRow(rows, zeronulls.WrapRowTo(pgx.RowToStructByName[testStruct]))
+	ts, err := pgx.CollectRows(rows, zeronulls.WrapRowTo(pgx.RowToStructByName[testStruct]))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if ts.Num != testValue {
-		t.Fatalf("unexpected read value, expected %d, got %d", testValue, ts.Num)
+	if len(ts) != 2 {
+		t.Fatalf("unexpected number of rows, expected 2, got %d", len(ts))
+	}
+	if ts[0].Num != testValue {
+		t.Fatalf("unexpected read value, expected %d, got %d", testValue, ts[0].Num)
+	}
+	if ts[1].Num != 0 {
+		t.Fatalf("unexpected read value, expected 0, got %d", ts[1].Num)
 	}
 }
 

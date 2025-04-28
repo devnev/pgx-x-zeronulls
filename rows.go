@@ -75,8 +75,9 @@ func (r *wrappedRows) Scan(dest ...any) error {
 		}
 
 		// This is where the NULL handling happens
-		if values[i] == nil {
-			reflect.ValueOf(dst).Elem().Set(reflect.Zero((r.scanTypes)[i]))
+		if values[i] == nil && r.scanTypes[i].Kind() == reflect.Ptr {
+			reflect.ValueOf(dst).Elem().Set(reflect.Zero((r.scanTypes)[i].Elem()))
+			continue
 		}
 
 		err := (r.scanPlans)[i].Scan(values[i], dst)
